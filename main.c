@@ -8,10 +8,7 @@
 #include <math.h>
 
 #include "menuPrints.h"
-#include "menuPrints.c"
-
 #include "funcs.h"
-#include "funcs.c"
 
 /* Prototypes mirroring the C++ version */
 

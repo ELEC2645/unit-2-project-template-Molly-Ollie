@@ -3,9 +3,9 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+
 #include "menuPrints.h"
-
-
+#include "funcs.c"
 
 /* Main Menu Option*/
 
@@ -20,14 +20,12 @@
 
  void print_main_menu(void)
 {
-    printf("\n         *Main menu*         \n");
-    printf("\n"
-           "\t\t\t\t\t\t\n"
-           "\t1. Unit Scaling 1\t\t\n"
-           "\t2. Pattern Scaling: Shape 2\t\t\n"
+    printf("---------------------------------------------\n"
+           "\n      -Main menu-         \n\n"
+           "\t1. Unit Scaling \t\t\n"
+           "\t2. Pattern Scaling: Shape \t\t\n"
            "\t3. Pattern Scaling: File\t\t\n"
-           "\t4. Exit\t\t\t\t\n"
-           "\t\t\t\t\t\t\n");
+           "\t4. Exit\t\t\t\t\n\n");
     printf("---------------------------------------------\n");
 }
 
@@ -71,11 +69,9 @@
     switch (input) {
         case 1:
             menu_unit_conversion();
-            go_back_to_main();
             break;
         case 2:
-            //menu_scale_shape();
-            go_back_to_main();
+            menu_scale_shape();
             break;
         case 3:
             //menu_scale_file();
@@ -99,7 +95,6 @@
         buf[strcspn(buf, "\r\n")] = '\0'; /* strip newline */
     } while (!(buf[0] == 'b' || buf[0] == 'B') || buf[1] != '\0');
 }
-
 /* Return 1 if s is an optional [+/-] followed by one-or-more digits, else 0. */
  int is_integer(const char *s)
 {
@@ -119,66 +114,116 @@
 }
 
 
+
 /* UNIT CONVERSION MENU*/
  void menu_unit_conversion(void)
 {
     print_unit_conversion();
-    {
-         int input = get_user_input_unit();
-         select_menu_item_unit(input);
+    char buf[128] = ""; //setting the buffer = empty to ensure no remaining value from last use
+    get_user_input_unit(buf); 
+    select_menu_item_unit(buf);
     }
-}
 
  void print_unit_conversion(void)
 {
-    printf("\n         *Unit Scaliing*         \n");
-
-    printf("\n"
-            "\n to return to main menu, press 'B'"
-            "\n to restart page, press 'R'"
-           "\t\t\t\t\t\t\n"
-           "\tEnter initial measurement in inches:\t\t\n"
-           "\t\t\t\t\t\t\n");
-    printf("---------------------------------------------\n");
+    printf("---------------------------------------------\n"
+           "\n\t         -Unit Conversion-         \n"
+           "\n\t To restart page, press 'r'\t\t\n"
+            "\n\t To exit page, press 'b'\t\t\n");
 }
 
- int get_user_input_unit(void)
+char* get_user_input_unit(char *buf)
 {
-    char buf[128];
     int valid_input = 0;
-    int value = 0;
-
-     do {
+    do {
+        printf("\t\t\t\t\t\t\nEnter initial measurement in inches:\t");
         if (!fgets(buf, sizeof(buf), stdin)) {
             // EOF or error; bail out gracefully
             puts("\nInput error. Exiting.");
             exit(1);
-        }
-
+        }else {     
         // strip trailing newline
-        buf[strcspn(buf, "\r\n")] = '\0';
-
-        value = (char)strtol(buf, NULL, 10);
+            buf[strcspn(buf, "\r\n")] = '\0';
+            valid_input = 1;
         }
-        
-        while (!valid_input);
-        return value;
+    } while (!valid_input);
+    return buf;
 }
 
- void select_menu_item_unit(int input)
+ void select_menu_item_unit(const char *buf)
 {
-    switch (input) {
-        case 'e':
-            char buf[64];
-            if (!fgets(buf, sizeof(buf), stdin)) {
-                puts("\nInput error. Exiting.");
-                exit(1);
-            }
-            buf[strcspn(buf, "\r\n")] = '\0'; /* strip newline */
-            while (!(buf[0] == 'b' || buf[0] == 'B') || buf[1] != '\0');
-
-        case 'B':
-            //menu_scale_shape();
-            break;
+    if (*buf == 'b'){
+        main_menu();
+    } else if (*buf == 'r'){ 
+        menu_unit_conversion();
+    }else{
+        int numberTrue = is_integer(buf) ;  //ensures user has entered a number 
+        double measurement = atof(buf);
+        if (numberTrue){
+            char unit[128] = get_unit();
+            unit_convert(measurement, unit); //if a valid numerical input is entered, the code will move to the functionality
+            menu_unit_conversion();
+        }else{printf("Measurement error! Please try again");}
     }
 }
+
+
+/*scale shape MENU*/
+void menu_scale_shape(void)
+{
+    print_scale_shape();
+    char buf[128] = ""; //setting the buffer, reusing the buffer local variable for readability
+    get_user_input_shape(buf); 
+    select_menu_item_shape(buf);
+    }
+
+ void print_scale_shape(void)
+{
+    printf("---------------------------------------------\n"
+           "\n\t         -Shape Scalling-         \n"
+           "\n\t To restart page, press 'r'\t\t\n"
+            "\n\t To exit page, press 'b'\t\t\n");
+}
+
+char* get_user_input_shape(char *buf)
+{
+    int valid_input = 0;
+    do {
+        printf("\t\t\nSelect shape:"
+               "\n for a square or rectangle, press 's'\n"
+               "\n for a circle, press 'c'\n"
+               "\n for a triangle, press 't'\n");
+        if (!fgets(buf, sizeof(buf), stdin)) {
+            // EOF or error; bail out gracefully
+            puts("\nInput error. Exiting.");
+            exit(1);
+        }else {     
+        // strip trailing newline
+            buf[strcspn(buf, "\r\n")] = '\0';
+            valid_input = 1;
+        }
+    } while (!valid_input);
+    return buf;
+}
+
+void select_menu_item_shape(const char *buf)
+{
+    if (*buf == 'b'){
+        main_menu();
+    } else if (*buf == 'r'){ 
+        menu_scale_shape();
+    }else if (*buf == 's') {
+        printf("square");
+    }else if (*buf == 'c') {
+        printf("circle functionality");
+    }else if (*buf == 't') {
+        printf("triangle functionality \n");
+    }else{
+        printf("please enter a valid option!");
+        char buf[128] = "";
+        get_user_input_shape(buf);
+    }
+}
+
+
+

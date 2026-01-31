@@ -10,12 +10,15 @@
 /*Scaling Menu*/
  void menu_unit_conversion(void);            /* runs in the main loop */
  void print_unit_conversion(void);
- int get_user_input_unit(void);
- void select_menu_item_unit(int input);
+ char* get_user_input_unit( char *buf);
+ void select_menu_item_unit(const char *buf);
 
 
 /* Scaling Shape Menu*/
-//static void menu_scale_shape(void);            /* runs in the main loop */
+void menu_scale_shape(void);            
+void print_scale_shape(void);
+char* get_user_input_shape( char *buf);
+void select_menu_item_shape(const char *buf);
 
 /* Scaling File Menu*/
 //static void menu_scale_file(void);            /* runs in the main loop */
